@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  museum:
+    build: .
+    ports:
+      - "5000:5000"
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    # Network isolation - no internet access
+    networks:
+      - isolated
+    # Security options
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: false  # Need write access for /tmp/museum.db
+    tmpfs:
+      - /tmp
+    environment:
+      - PYTHONUNBUFFERED=1
+
+networks:
+  isolated:
+    driver: bridge
+    internal: true  # No external network access
